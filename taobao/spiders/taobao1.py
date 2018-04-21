@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy
 import json
-
+from redis import Redis
 from scrapy_redis.spiders import RedisSpider
 
 from taobao.items import TaobaoItem
@@ -13,6 +13,7 @@ class Taobao1Spider(RedisSpider):
     name = 'taobao1'
     redis_key = 'urls:test1'
     count = 1
+    r = Redis()
 
     def __init__(self, *args, **kwargs):
         domain = kwargs.pop('domain', '')
@@ -23,11 +24,13 @@ class Taobao1Spider(RedisSpider):
         print(str(self.count) + '===============================================')
         content = json.loads(response.text)
         ret = content.get('ret')
+        print(response.url)
         if re.match(r'FAIL_SYS_USER_VALIDATE:', ret[0]):
             print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
-            # yield scrapy.Request(self.id_url.format(id=id), self.parse_id, meta={'id': id})
+            self.r.lpush('urls:test1', response.url)
         if 'item' in content['data'].keys():
             item = TaobaoItem()
+            item['id'] = content['data']['item']['itemId']
             item['content'] = response.text
             item['title'] = content['data']['item']['title']
             # print(content['data']['item']['title'])
