@@ -19,7 +19,7 @@ class WritePipeline(object):
         time = now.strftime('%Y')+'年'+now.strftime('%m')+'月' + now.strftime('%d') + \
             '日'+now.strftime('%H')+'时'+now.strftime('%M') + \
             '分'+now.strftime('%S')+'秒'
-        with open(pwd+'/shuju/{time}_{id}.txt'.format(id=item['id'], time=time), 'w', encoding='utf-8') as f:
+        with open(pwd+'/shuju/{time}.txt'.format(time=time), 'w', encoding='utf-8') as f:
             f.write(item['content'])
             print('写入成功')
         return item
