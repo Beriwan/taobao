@@ -121,5 +121,5 @@ USER_AGENTS = [
 SCHEDULER = "scrapy_redis.scheduler.Scheduler"
 DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
 
-REDIS_HOST = '118.126.100.56'                           # 主机名
+REDIS_HOST = '118.126.100.56'
 REDIS_PORT = 6379
