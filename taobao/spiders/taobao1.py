@@ -13,7 +13,7 @@ class Taobao1Spider(RedisSpider):
     name = 'taobao1'
     redis_key = 'urls:test1'
     count = 1
-    r = Redis()
+    r = Redis(host='118.126.100.56', port=6379, db=0)
 
     def __init__(self, *args, **kwargs):
         domain = kwargs.pop('domain', '')
