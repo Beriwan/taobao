@@ -11,38 +11,34 @@ import os
 import pymysql
 
 db_config = {
-    'host': '127.0.0.1',
+    'host': '118.126.100.56',
     'port': 3306,
-    'user': 'root',
-    'password': 'woshiren12',
-    'db': 'info2',
+    'user': 'admin',
+    'password': '123456',
+    'db': 'TEST1',
     'charset': 'utf8'
 }
 
 
-class LgspiderPipeline(object):
+class MysqlPipeline(object):
     # 获取数据库连接和游标
     def __init__(self):
         self.connection = pymysql.connect(**db_config)
         self.cursor = self.connection.cursor()
 
     def process_item(self, item, spider):
-        sql = 'insert into info01(title, salary, position, time, grade, company) values(%s, %s, %s, %s, %s, %s)'
+        sql = 'replace into info01(itemid, title) values(%s, %s)'
         try:
-            self.cursor.execute(sql, (item['title'].encode('utf-8'),
-                                      item['salary'],
-                                      item['position'].encode('utf-8'),
-                                      item['time'].encode('utf-8'),
-                                      item['grade'].encode('utf-8'),
-                                      item['company'].encode('utf-8'),
-                                      )
+            self.cursor.execute(sql, (
+                item['id'],
+                item['title'],
+            )
                                 )
             self.connection.commit()
+            print('写入Mysql')
         except pymysql.Error as e:
             print(e.args)
         return item
-
-
 
 
 class WritePipeline(object):
@@ -51,10 +47,10 @@ class WritePipeline(object):
         pwd = os.getcwd()
         print(item['title'])
         now = datetime.now()
-        time = now.strftime('%Y')+'年'+now.strftime('%m')+'月' + now.strftime('%d') + \
-            '日'+now.strftime('%H')+'时'+now.strftime('%M') + \
-            '分'+now.strftime('%S')+'秒'
-        with open(pwd+'/shuju/{time}.txt'.format(time=time), 'w', encoding='utf-8') as f:
+        time = now.strftime('%Y') + '年' + now.strftime('%m') + '月' + now.strftime('%d') + \
+               '日' + now.strftime('%H') + '时' + now.strftime('%M') + \
+               '分' + now.strftime('%S') + '秒'
+        with open(pwd + '/shuju/{time}.txt'.format(time=time), 'w', encoding='utf-8') as f:
             f.write(item['content'])
             print('写入成功')
         return item
