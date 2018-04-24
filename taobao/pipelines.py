@@ -10,6 +10,7 @@ from scrapy.exceptions import DropItem
 import re
 import os
 import pymysql
+import requests
 
 
 db_config = {
@@ -76,18 +77,29 @@ class PostPipeline(object):
     items = []
     data = {'goodschange': ''}
     count = 0
+    url = 'http://zbzs.wanshangtang.com/home/Tbapi/goodschange'
 
     def process_item(self, item, spider):
+        dict_item = dict(item)
+        dict_item.pop('content')
         if self.count == 5:
             json_items = json.dumps(self.items)
             self.data['goodschange'] = json_items
+            #response = requests.post(self.url, data=self.data)
+            #print(response.text)
             print(self.data)
             del self.items[:]
-            self.items.append(dict(item))
+            self.items.append(dict_item)
             self.count = 1
         if self.count < 5:
-            self.items.append(dict(item))
+            self.items.append(dict_item)
             self.count += 1
-            print(self.count)
+        return item
 
+    def close_spider(self, spider):
+        json_items = json.dumps(self.items)
+        self.data['goodschange'] = json_items
+        # response = requests.post(self.url, data=self.data)
+        # print(response.text)
+        print(self.data)
 

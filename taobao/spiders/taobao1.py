@@ -24,14 +24,18 @@ class Taobao1Spider(RedisSpider):
         print(str(self.count) + '===============================================')
         content = json.loads(response.text)
         ret = content.get('ret')
+        re_drop = re.compile(r'redirectUrl')
         print(response.url)
         if re.match(r'FAIL_SYS_USER_VALIDATE:', ret[0]):
-            print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+            print('访问太频繁，重新访问')
             self.r.lpush('urls:test1', response.url)
+            self.parse()
+        if re_drop.search(response.text):
+            print('商品过期不存在')
         if 'item' in content['data'].keys():
             item = TaobaoItem()
             item['itemId'] = content['data']['item']['itemId']
-            #item['content'] = response.text
+            item['content'] = response.text
             value = content['data']['apiStack'][0]['value']
             value = json.loads(value)
             item['quantity'] = value['skuCore']['sku2info']['0']['quantity']
@@ -39,7 +43,7 @@ class Taobao1Spider(RedisSpider):
             item['deposittime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             #item['title'] = content['data']['item']['title']
             yield item
-        else:
-            print('下架===============================================')
+
+
 
         self.count += 1
