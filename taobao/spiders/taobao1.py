@@ -3,7 +3,7 @@ import scrapy
 import json
 from redis import Redis
 from scrapy_redis.spiders import RedisSpider
-
+from datetime import datetime
 from taobao.items import TaobaoItem
 import re
 import os
@@ -30,10 +30,14 @@ class Taobao1Spider(RedisSpider):
             self.r.lpush('urls:test1', response.url)
         if 'item' in content['data'].keys():
             item = TaobaoItem()
-            item['id'] = content['data']['item']['itemId']
-            item['content'] = response.text
-            item['title'] = content['data']['item']['title']
-            # print(content['data']['item']['title'])
+            item['itemId'] = content['data']['item']['itemId']
+            #item['content'] = response.text
+            value = content['data']['apiStack'][0]['value']
+            value = json.loads(value)
+            item['quantity'] = value['skuCore']['sku2info']['0']['quantity']
+            item['itemprice'] = value['skuCore']['sku2info']['0']['price']['priceText']
+            item['deposittime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            #item['title'] = content['data']['item']['title']
             yield item
         else:
             print('下架===============================================')

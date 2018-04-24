@@ -4,11 +4,13 @@
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
+import json
 from datetime import datetime
 from scrapy.exceptions import DropItem
 import re
 import os
 import pymysql
+
 
 db_config = {
     'host': '118.126.100.56',
@@ -68,3 +70,24 @@ class DropPipeline(object):
                 raise DropItem('商品id: {id} 已下架'.format(id=item['id']))
             else:
                 return item
+
+
+class PostPipeline(object):
+    items = []
+    data = {'goodschange': ''}
+    count = 0
+
+    def process_item(self, item, spider):
+        if self.count == 5:
+            json_items = json.dumps(self.items)
+            self.data['goodschange'] = json_items
+            print(self.data)
+            del self.items[:]
+            self.items.append(dict(item))
+            self.count = 1
+        if self.count < 5:
+            self.items.append(dict(item))
+            self.count += 1
+            print(self.count)
+
+

@@ -23,7 +23,7 @@ DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
 ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-CONCURRENT_REQUESTS = 16
+CONCURRENT_REQUESTS = 3
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
@@ -71,8 +71,9 @@ DOWNLOADER_MIDDLEWARES = {
 ITEM_PIPELINES = {
     #'taobao.pipelines.DropPipeline': 299,
     #'taobao.pipelines.WritePipeline': 300,
-    'scrapy_redis.pipelines.RedisPipeline': 301,
-    'taobao.pipelines.MysqlPipeline': 302,
+    #'scrapy_redis.pipelines.RedisPipeline': 301,
+    #'taobao.pipelines.MysqlPipeline': 302,
+    'taobao.pipelines.PostPipeline': 303
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
