@@ -73,7 +73,8 @@ ITEM_PIPELINES = {
     #'taobao.pipelines.WritePipeline': 300,
     #'scrapy_redis.pipelines.RedisPipeline': 301,
     #'taobao.pipelines.MysqlPipeline': 302,
-    'taobao.pipelines.PostPipeline': 303
+    'taobao.pipelines.PostPipeline': 303,
+
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

@@ -12,7 +12,6 @@ import os
 import pymysql
 import requests
 
-
 db_config = {
     'host': '118.126.100.56',
     'port': 3306,
@@ -74,32 +73,63 @@ class DropPipeline(object):
 
 
 class PostPipeline(object):
-    items = []
+    change = []
+    updata = []
     data = {'goodschange': ''}
-    count = 0
-    url = 'http://zbzs.wanshangtang.com/home/Tbapi/goodschange'
+    data1 = {'update_goods': ''}
+    count_change = 0
+    count_updata = 0
+    url_change = 'http://zbzs.wanshangtang.com/home/Tbapi/goodschange'
+    url_updata = 'http://zbzs.wanshangtang.com/home/Tbapi/update_goods'
+
+    def post_updata(self, dict_item):
+        items = {"itemId": dict_item["itemId"], "tb_state": dict_item["tb_state"], "zb_state": dict_item["zb_state"]}
+
+        if self.count_updata < 5:
+            self.updata.append(items)
+            print(self.updata)
+            self.count_updata += 1
+            print(self.count_updata)
+        if self.count_updata == 5:
+            json_updata = json.dumps(self.updata)
+            self.data1['update_goods'] = json_updata
+            # response = requests.post(self.url_updata, data=self.data1)
+            # print(response.text)
+            print(self.data1)
+            del self.updata[:]
+            self.updata.append(items)
+            self.count_updata = 1
 
     def process_item(self, item, spider):
         dict_item = dict(item)
-        dict_item.pop('content')
-        if self.count == 5:
-            json_items = json.dumps(self.items)
-            self.data['goodschange'] = json_items
-            #response = requests.post(self.url, data=self.data)
-            #print(response.text)
-            print(self.data)
-            del self.items[:]
-            self.items.append(dict_item)
-            self.count = 1
-        if self.count < 5:
-            self.items.append(dict_item)
-            self.count += 1
+        self.post_updata(dict_item)
+        # dict_item.pop('content')
+        if dict_item.get('itemprice'):
+            items = {"itemId": dict_item["itemId"], "itemprice": dict_item["itemprice"],
+                     "quantity": dict_item["quantity"],'deposittime':dict_item["deposittime"]}
+            if self.count_change < 5:
+                self.change.append(items)
+                self.count_change += 1
+            if self.count_change == 5:
+                json_change = json.dumps(self.change)
+                self.data['goodschange'] = json_change
+                # response = requests.post(self.url_change, data=self.data)
+                # print(response.text)
+                print(self.data)
+                del self.change[:]
+                self.change.append(items)
+                self.count_change = 1
         return item
 
     def close_spider(self, spider):
-        json_items = json.dumps(self.items)
-        self.data['goodschange'] = json_items
-        # response = requests.post(self.url, data=self.data)
-        # print(response.text)
+        json_change = json.dumps(self.change)
+        json_updata = json.dumps(self.updata)
+        self.data['goodschange'] = json_change
+        self.data1['update_goods'] = json_updata
+        # r_change = requests.post(self.url_change, data=self.data)
+        # r_updata = requests.post(self.url_updata, data=self.data1)
+        # print('----------------------------------')
+        # print(r_change.text)
+        # print(r_updata.text)
         print(self.data)
-
+        print(self.data1)

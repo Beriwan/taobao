@@ -8,12 +8,14 @@ from taobao.items import TaobaoItem
 import re
 import os
 
+from taobao.settings import *
+
 
 class Taobao1Spider(RedisSpider):
     name = 'taobao1'
     redis_key = 'urls:test1'
     count = 1
-    r = Redis(host='118.126.100.56', port=6379, db=0)
+    r = Redis(host=REDIS_HOST, port=REDIS_PORT, db=0)
 
     def __init__(self, *args, **kwargs):
         domain = kwargs.pop('domain', '')
@@ -29,21 +31,31 @@ class Taobao1Spider(RedisSpider):
         if re.match(r'FAIL_SYS_USER_VALIDATE:', ret[0]):
             print('访问太频繁，重新访问')
             self.r.lpush('urls:test1', response.url)
-            self.parse()
         if re_drop.search(response.text):
+            item = TaobaoItem()
+            item['zb_state'] = 1
+            item['tb_state'] = 1
+            item['itemId'] = re.search('itemNumId%22%3A%22(\d+)', response.url).group(1)
+            yield item
             print('商品过期不存在')
         if 'item' in content['data'].keys():
             item = TaobaoItem()
-            item['itemId'] = content['data']['item']['itemId']
-            item['content'] = response.text
             value = content['data']['apiStack'][0]['value']
             value = json.loads(value)
+            if value['trade'].get('hintBanner'):
+                item['judge'] = value['trade']['hintBanner']['text']
+                if item['judge'] == '已下架':
+                    item['zb_state'] = 1
+                    item['tb_state'] = 1
+            else:
+                item['zb_state'] = 1
+                item['tb_state'] = 1
+            item['itemId'] = content['data']['item']['itemId']
+            item['content'] = response.text
             item['quantity'] = value['skuCore']['sku2info']['0']['quantity']
             item['itemprice'] = value['skuCore']['sku2info']['0']['price']['priceText']
             item['deposittime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            #item['title'] = content['data']['item']['title']
+            # item['title'] = content['data']['item']['title']
             yield item
-
-
 
         self.count += 1

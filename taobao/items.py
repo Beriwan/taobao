@@ -10,6 +10,9 @@ import scrapy
 
 class TaobaoItem(scrapy.Item):
     # define the fields for your item here like:
+    tb_state = scrapy.Field()
+    zb_state = scrapy.Field()
+    judge = scrapy.Field()
     itemId = scrapy.Field()
     content = scrapy.Field()
     title = scrapy.Field()
