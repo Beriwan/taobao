@@ -49,7 +49,7 @@ class Taobao1Spider(RedisSpider):
                     item['tb_state'] = 1
             else:
                 item['zb_state'] = 1
-                item['tb_state'] = 1
+                item['tb_state'] = 0
             item['itemId'] = content['data']['item']['itemId']
             #item['content'] = response.text
             item['quantity'] = value['skuCore']['sku2info']['0']['quantity']

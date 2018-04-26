@@ -93,8 +93,8 @@ class PostPipeline(object):
         if self.count_updata == 5:
             json_updata = json.dumps(self.updata)
             self.data1['update_goods'] = json_updata
-            response = requests.post(self.url_updata, data=self.data1)
-            print(response.text)
+            # response = requests.post(self.url_updata, data=self.data1)
+            # print(response.text)
             print(self.data1)
             del self.updata[:]
             #self.updata.append(items)
@@ -113,8 +113,8 @@ class PostPipeline(object):
             if self.count_change == 5:
                 json_change = json.dumps(self.change)
                 self.data['goodschange'] = json_change
-                response = requests.post(self.url_change, data=self.data)
-                print(response.text)
+                # response = requests.post(self.url_change, data=self.data)
+                # print(response.text)
                 print(self.data)
                 del self.change[:]
                 #self.change.append(items)
@@ -126,10 +126,10 @@ class PostPipeline(object):
         json_updata = json.dumps(self.updata)
         self.data['goodschange'] = json_change
         self.data1['update_goods'] = json_updata
-        r_change = requests.post(self.url_change, data=self.data)
-        r_updata = requests.post(self.url_updata, data=self.data1)
-        print('----------------------------------')
-        print(r_change.text)
-        print(r_updata.text)
+        # r_change = requests.post(self.url_change, data=self.data)
+        # r_updata = requests.post(self.url_updata, data=self.data1)
+        # print('----------------------------------')
+        # print(r_change.text)
+        # print(r_updata.text)
         print(self.data)
         print(self.data1)
