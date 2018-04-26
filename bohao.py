@@ -1,5 +1,6 @@
 import subprocess
 import re
+import redis
 
 ADSL_IFNAME = 'adsl-stop;adsl-start'
 

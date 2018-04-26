@@ -9,6 +9,7 @@ from scrapy import signals
 import random
 from taobao.settings import USER_AGENTS
 import requests
+from taobao.ipdb import *
 
 
 class MyproxisSpiderMidleware(object):
@@ -27,12 +28,12 @@ class MyproxisSpiderMidleware(object):
             return None
 
     def get_proxy1(self):
-        with open('D:/work/IP代理2.txt', 'r') as f:
-            ip = random.choice(f.readlines())
-            return ip.strip()
+        r = RedisClient()
+        ip = r.random()
+        return ip
 
     def process_request(self, request, spider):
-        proxy = self.get_proxy()
+        proxy = self.get_proxy1()
         print('this is ip:' + proxy)
         request.meta['proxy'] = 'https://'+proxy
 
