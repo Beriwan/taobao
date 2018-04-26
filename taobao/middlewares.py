@@ -36,10 +36,20 @@ class MyproxisSpiderMidleware(object):
         print('this is ip:' + proxy)
         request.meta['proxy'] = 'https://'+proxy
 
+    def process_response(self, request, response, spider):
+        '''对返回的response处理'''
+        # 如果返回的response状态不是200，重新生成当前request对象
+        if response.status != 200:
+            proxy = self.get_proxy()
+            print("this is response ip:" + proxy)
+            # 对当前reque加上代理
+            request.meta['proxy'] = proxy
+            return request
+        return response
+
 
 class RandomUserAgent(object):
     """docstring for RandomUserAgent"""
     def process_request(self, request, spider):
         useragent = random.choice(USER_AGENTS)
         request.headers.setdefault('User-Agent', useragent)
-        

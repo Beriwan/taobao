@@ -51,7 +51,7 @@ class Taobao1Spider(RedisSpider):
                 item['zb_state'] = 1
                 item['tb_state'] = 1
             item['itemId'] = content['data']['item']['itemId']
-            item['content'] = response.text
+            #item['content'] = response.text
             item['quantity'] = value['skuCore']['sku2info']['0']['quantity']
             item['itemprice'] = value['skuCore']['sku2info']['0']['price']['priceText']
             item['deposittime'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
