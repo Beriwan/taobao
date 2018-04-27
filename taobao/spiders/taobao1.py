@@ -34,13 +34,7 @@ class Taobao1Spider(RedisSpider):
         if re.match(r'FAIL_SYS_USER_VALIDATE:', ret[0]):
             self.r.lpush('urls:test1', response.url)
             print('访问太频繁，重新访问')
-            print('开始拨号')
-            (status, output) = subprocess.getstatusoutput(ADSL_IFNAME)
-            if status == 0:
-                print('拨号成功')
-            else:
-                print('拨号失败，休息一会')
-                time.sleep(10)
+            time.sleep(100)
         if re_drop.search(response.text):
             item = TaobaoItem()
             item['zb_state'] = 1

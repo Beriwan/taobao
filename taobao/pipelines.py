@@ -6,6 +6,8 @@
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import json
 from datetime import datetime
+
+from requests import RequestException
 from scrapy.exceptions import DropItem
 import re
 import os
@@ -87,37 +89,44 @@ class PostPipeline(object):
 
         if self.count_updata < 5:
             self.updata.append(items)
-            #print(self.updata)
             self.count_updata += 1
             print(self.count_updata)
         if self.count_updata == 5:
             json_updata = json.dumps(self.updata)
             self.data1['update_goods'] = json_updata
-            response = requests.post(self.url_updata, data=self.data1)
-            print(response.text)
+            try:
+                response = requests.post(self.url_updata, data=self.data1)
+                if response.status_code == 200:
+                    print(response.text)
+            except RequestException:
+                print('POST出错')
+                return None
             print(self.data1)
             del self.updata[:]
-            #self.updata.append(items)
             self.count_updata = 0
 
     def process_item(self, item, spider):
         dict_item = dict(item)
         self.post_updata(dict_item)
-        #dict_item.pop('content')
+        # dict_item.pop('content')
         if dict_item.get('itemprice'):
             items = {"itemId": dict_item["itemId"], "itemprice": dict_item["itemprice"],
-                     "quantity": dict_item["quantity"],'deposittime':dict_item["deposittime"]}
+                     "quantity": dict_item["quantity"], 'deposittime': dict_item["deposittime"]}
             if self.count_change < 5:
                 self.change.append(items)
                 self.count_change += 1
             if self.count_change == 5:
                 json_change = json.dumps(self.change)
                 self.data['goodschange'] = json_change
-                response = requests.post(self.url_change, data=self.data)
-                print(response.text)
+                try:
+                    response = requests.post(self.url_change, data=self.data)
+                    if response.status_code == 200:
+                        print(response.text)
+                except RequestException:
+                    print('POST出错')
+                    return None
                 print(self.data)
                 del self.change[:]
-                #self.change.append(items)
                 self.count_change = 0
         return item
 
