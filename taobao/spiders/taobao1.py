@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+import subprocess
+import time
+
 import scrapy
 import json
 from redis import Redis
@@ -29,8 +32,15 @@ class Taobao1Spider(RedisSpider):
         re_drop = re.compile(r'redirectUrl')
         print(response.url)
         if re.match(r'FAIL_SYS_USER_VALIDATE:', ret[0]):
-            print('访问太频繁，重新访问')
             self.r.lpush('urls:test1', response.url)
+            print('访问太频繁，重新访问')
+            print('开始拨号')
+            (status, output) = subprocess.getstatusoutput(ADSL_IFNAME)
+            if status == 0:
+                print('拨号成功')
+            else:
+                print('拨号失败，休息一会')
+                time.sleep(10)
         if re_drop.search(response.text):
             item = TaobaoItem()
             item['zb_state'] = 1
@@ -44,9 +54,12 @@ class Taobao1Spider(RedisSpider):
             value = json.loads(value)
             if value['trade'].get('hintBanner'):
                 item['judge'] = value['trade']['hintBanner']['text']
-                if item['judge'] == '已下架':
+                if item['judge'] == '已下架' or item['judge'] == '商品已经下架啦~':
                     item['zb_state'] = 1
                     item['tb_state'] = 1
+                else:
+                    item['zb_state'] = 1
+                    item['tb_state'] = 0
             else:
                 item['zb_state'] = 1
                 item['tb_state'] = 0

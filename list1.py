@@ -9,7 +9,7 @@ id_url = 'https://acs.m.taobao.com/h5/mtop.taobao.detail.getdetail/6.0/?data=%7B
 def main():
     r = Redis(host='118.126.100.56', port=6379, db=0)
     try:
-        response = requests.get('http://zbzs.wanshangtang.com/home/Tbapi/get_goods?g_count=100')
+        response = requests.get('http://zbzs.wanshangtang.com/home/Tbapi/get_goods?g_count=1000')
         if response.status_code == 200:
             text = json.loads(response.text)
             for i in range(0, len(text)):
